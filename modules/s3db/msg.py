@@ -1666,10 +1666,21 @@ class S3TwitterSearchModel(S3ChannelModel):
         # ---------------------------------------------------------------------
         # Twitter Search results
         #
+
+        tweet_categories = {
+            "civil.demonstrations": T("Demonstrations"),
+            "civil.dignitaryVisit": T("Dignitary Visit"),
+            "civil.displacedPopulations": T("Displaced Populations"),
+            "civil.emergency": T("Civil Emergency"),
+            "civil.looting": T("Looting"),
+            "civil.publicEvent": T("Public Event"),
+            "civil.riot": T("Riot"),
+            "civil.volunteerRequest": T("Volunteer Request")}
+        
         tablename = "msg_twitter_result"
         table = define_table(tablename,
                              self.super_link("message_id", "msg_message"),
-                             query_id(),
+#                             query_id(),
                              Field("tweet_id",
                                    label = T("Tweet ID")),
                              Field("lang",
@@ -1678,6 +1689,9 @@ class S3TwitterSearchModel(S3ChannelModel):
                                    label = T("Tweeted by")),
                              Field("body",
                                    label = T("Tweet")),
+                             Field("cat",
+                                   label = T("Category"),
+                                   requires = IS_NULL_OR(IS_IN_SET(tweet_categories))),
                              Field("lat", "double",
                                    label = T("Latitude"),
                                    requires = IS_NULL_OR(IS_LAT())),
@@ -1700,6 +1714,7 @@ class S3TwitterSearchModel(S3ChannelModel):
                                  "lang",
                                  "created_on",
                                  "body",
+                                 "cat",
                                  "lat",
                                  "lon",
                                  #"places",

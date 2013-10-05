@@ -1767,6 +1767,7 @@ class S3Msg(object):
                 tweet_id = tweet["id_str"]
                 lang = tweet["lang"]
                 created_on = parser.parse(tweet["created_at"])
+                cat = None
                 lat = None
                 lon = None
                 if tweet["coordinates"]:
@@ -1778,6 +1779,7 @@ class S3Msg(object):
                                    tweet_id = tweet_id,
                                    lang = lang,
                                    created_on = created_on,
+                                   cat = cat,
                                    lat = lat,
                                    lon = lon)
                 rquery = (rtable.id == id)
