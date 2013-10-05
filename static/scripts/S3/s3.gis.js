@@ -591,6 +591,7 @@ OpenLayers.ProxyHost = S3.Ap.concat('/gis/proxy?url=');
             if (options.save) {
                 addSavePanel(map);
             }
+            addThrobber(map);
         }
 
         var mapPanelContainer = new Ext.Panel({
@@ -743,15 +744,22 @@ OpenLayers.ProxyHost = S3.Ap.concat('/gis/proxy?url=');
             }
         };
 
-        // @ToDo: Run this when clicking on + as well as title
+        var updateLayout = function() {
+            // Trigger a layout update on the westPanelContainer
+            var westPanelContainer = s3.westPanelContainer;
+            westPanelContainer.fireEvent('collapse');
+            window.setTimeout(function() {
+                westPanelContainer.fireEvent('expand')
+            }, 300);
+        };
         var folder_listeners = {
-            click: function(node) {
+            collapse: function(node) {
                 // Trigger a layout update on the westPanelContainer
-                var westPanelContainer = s3.westPanelContainer;
-                westPanelContainer.fireEvent('collapse');
-                window.setTimeout(function() {
-                    westPanelContainer.fireEvent('expand')
-                }, 300);
+                updateLayout()
+            },
+            expand: function(node) {
+                // Trigger a layout update on the westPanelContainer
+                updateLayout()
             }
         };
 
@@ -3130,13 +3138,14 @@ OpenLayers.ProxyHost = S3.Ap.concat('/gis/proxy?url=');
         var popup = new OpenLayers.Popup.FramedCloud(
             popup_id,
             centerPoint,
-            new OpenLayers.Size(200, 200),
+            new OpenLayers.Size(400, 400),
             contents,
-            null,
-            true,
-            onPopupClose
+            null,        // anchor
+            true,        // closeBox
+            onPopupClose // closeBoxCallback
         );
-        popup.disableFirefoxOverflowHack = true;
+        //popup.disableFirefoxOverflowHack = true; // Still needed
+        //popup.keepInMap = false; // Not working
         if (undefined != popup_url) {
             // call AJAX to get the contentHTML
             loadDetails(popup_url, popup_id + '_contentDiv', popup);
@@ -3994,6 +4003,24 @@ OpenLayers.ProxyHost = S3.Ap.concat('/gis/proxy?url=');
         toolbar.addButton(saveButton);
     }
 
+    // Save throbber as floating DIV to see when map layers are loading
+    var addThrobber = function(map) {
+        var s3 = map.s3;
+        var map_id = s3.id;
+        if ($('#' + map_id + ' .layer_throbber').length) {
+            // We already have a Throbber
+            // (this happens when switching between full-screen & embedded)
+            return;
+        }
+        var div = '<div class="layer_throbber float hide';
+        if (s3.options.save) {
+            // Add save class so that we know to push throbber down below save button
+            div += ' save';
+        }
+        div += '"></div>';
+        $('#' + map_id).append(div);
+    }
+    
     // Save button as floating DIV to save the Viewport settings
     var addSavePanel = function(map) {
         var s3 = map.s3;
@@ -5209,7 +5236,7 @@ OpenLayers.ProxyHost = S3.Ap.concat('/gis/proxy?url=');
                 if (undefined != elem.fillOpacity) {
                     fillOpacity = elem.fillOpacity;
                 } else {
-                    fillOpacity = 1;
+                    fillOpacity = opacity;
                 }
                 if (undefined != elem.strokeOpacity) {
                     strokeOpacity = elem.strokeOpacity;

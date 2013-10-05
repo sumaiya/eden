@@ -13,13 +13,11 @@ body {
 }
 
 /* Saved Maps */
-#config-gis_config_pe_id-options-filter__row .s3-groupedopts-option {
-    /* Hide the Radios (we can click on labels) */
-    display: none;
-}
-#config-gis_config_pe_id-options-filter__row .s3-groupedopts-widget td:first-child {
-    border-right: solid 1px;
+#config-gis_config_pe_id-options-filter__row .s3-groupedopts-widget td {
     padding-right: 10px;
+}
+#config-gis_config_pe_id-options-filter__row .s3-groupedopts-widget td:last-child {
+    border-left: solid 1px;
 }
 
 /* Summary Page */
@@ -316,13 +314,6 @@ div.map_legend_tab {
     margin-right: -1px;
 }
 
-/* Hide border on main map (avoids 2x border) + layer panel*/ 
-div#ext-gen105,
-div#ext-gen113 {
-    border: none;
-    padding: 1px;
-}
-
 div.map_legend_panel {
     margin-bottom: 30px;
 }
@@ -356,7 +347,6 @@ div.map_legend_panel {
 .pt-show-totals-option,
 .pt-chart-controls,
 .pt-hide-chart,
-.pt-toggle-table
- {
+.pt-toggle-table {
     display: none;
 }

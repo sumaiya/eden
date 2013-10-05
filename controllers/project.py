@@ -419,6 +419,7 @@ def theme_sector_widget():
         label = T("Themes"),
         field = "theme_id",
         cols = 4,
+        translate = True,
         # Filter Theme by Sector
         filter = {"linktable": "project_theme_sector",
                   "lkey": "theme_id",
@@ -524,6 +525,22 @@ def activity_type_sector():
     return s3_rest_controller()
 
 # -----------------------------------------------------------------------------
+def activity_organisation():
+    """ RESTful CRUD controller for options.s3json lookups """
+
+    if auth.permission.format != "s3json":
+        return ""
+
+    # Pre-process
+    def prep(r):
+        if r.method != "options":
+            return False
+        return True
+    s3.prep = prep
+
+    return s3_rest_controller()
+
+# -----------------------------------------------------------------------------
 def activity():
     """ RESTful CRUD controller """
 
@@ -585,12 +602,6 @@ def location():
         if r.representation == "plain":
             # Replace the Map Popup contents with custom content
             item = TABLE()
-            def represent(record, field):
-                if field.represent:
-                    return field.represent(record[field])
-                else:
-                    return record[field]
-
             if settings.get_project_community():
                 # The Community is the primary resource
                 record = r.record
@@ -628,6 +639,10 @@ def location():
                 ptable.id.readable = False
                 fields = [ptable[f] for f in ptable.fields if ptable[f].readable]
                 for field in fields:
+                    if field == "currency":
+                        # Don't display Currency if no Budget
+                        if not project["budget"]:
+                            continue
                     data = project[field]
                     if data:
                         represent = field.represent
@@ -639,7 +654,7 @@ def location():
                 title = s3.crud_strings["project_project"].title_display
                 # Assume authorised to see details
                 popup_url = URL(f="project", args=[project_id])
-                details_btn = A(T("Show Details"), _href=popup_url,
+                details_btn = A(T("Open"), _href=popup_url,
                                 _id="details-btn", _target="_blank")
                 output = dict(item = item,
                               title = title,
